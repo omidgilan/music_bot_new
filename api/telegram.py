@@ -23,10 +23,13 @@ songs = {
         "file": "https://t.me/solfg0_filebot/46",
         "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
     },
-    # آهنگ جدید اضافه شد
     "معین - طناز": {
         "file": "https://t.me/solfg0_filebot/49",
         "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
+    },
+    "معین - وقتی که تو رفتی": {
+        "file": "https://t.me/solfg0_filebot/53",
+        "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"
     }
 }
 
@@ -35,6 +38,7 @@ songs = {
 def inline_query_handler(inline_query):
     results = []
     for name, info in songs.items():
+        # هر آیتم آینلاین با دکمه شیشه‌ای برای رفتن به چت ربات
         markup = types.InlineKeyboardMarkup()
         btn = types.InlineKeyboardButton(
             text="باز کردن در ربات",
