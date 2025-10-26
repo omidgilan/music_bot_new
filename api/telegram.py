@@ -34,6 +34,10 @@ songs = {
     "معین - من باهاتم": {
         "file": "https://t.me/solfg0_filebot/55",
         "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"
+    },
+    "معین - دعای شب": {
+        "file": "https://t.me/solfg0_filebot/60",
+        "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"
     }
 }
 
