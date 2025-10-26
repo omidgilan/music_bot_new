@@ -67,8 +67,8 @@ def inline_query_handler(inline_query):
             ))
     bot.answer_inline_query(inline_query.id, results, cache_time=0)
 
-# ======= جستجوی آهنگ‌ها در چت ربات =======
-@bot.message_handler(func=lambda message: True)
+# ======= جستجوی آهنگ‌ها در چت ربات (فقط پیام‌های واقعی کاربر) =======
+@bot.message_handler(func=lambda message: not message.from_user.is_bot)
 def search_songs(message):
     query = message.text.lower()
     found_songs = {name: info for name, info in songs.items() if query in name.lower()}
@@ -111,4 +111,5 @@ def send_welcome(message):
     markup.add(btn)
     bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
 
+# ======= اجرای ربات =======
 bot.infinity_polling()
