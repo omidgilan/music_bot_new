@@ -46,14 +46,13 @@ songs = {
 def inline_query_handler(inline_query):
     results = []
     for name, info in songs.items():
-        # هر آیتم آینلاین با دکمه شیشه‌ای برای رفتن به چت ربات
         markup = types.InlineKeyboardMarkup()
+        # فقط یک دکمه شیشه‌ای برای هدایت به آینلاین
         btn = types.InlineKeyboardButton(
             text="باز کردن در ربات",
             switch_inline_query_current_chat=name
         )
         markup.add(btn)
-
         results.append(types.InlineQueryResultArticle(
             id=name,
             title=name,
@@ -76,6 +75,24 @@ def send_welcome(message):
     )
     markup.add(btn)
     bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
+
+# ======= ارسال آهنگ بر اساس پیام تایپ شده =======
+@bot.message_handler(func=lambda m: True)
+def send_song_by_text(message):
+    query = message.text.lower()
+    matched = {name: info for name, info in songs.items() if query in name.lower()}
+    if matched:
+        for name, info in matched.items():
+            # نمایش در حال ارسال
+            bot.send_chat_action(chat_id=message.chat.id, action="typing")
+            # فقط لینک فایل و یک دکمه شیشه‌ای
+            markup = types.InlineKeyboardMarkup()
+            btn = types.InlineKeyboardButton(
+                text="باز کردن در ربات",
+                switch_inline_query_current_chat=name
+            )
+            markup.add(btn)
+            bot.send_message(message.chat.id, f"{name}\n{info['file']}", reply_markup=markup)
 
 # ======= شروع ربات =======
 bot.infinity_polling()
