@@ -5,7 +5,7 @@ from telebot import types
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
 
-# 🔹 دیکشنری آهنگ‌ها
+# 🔹 دیکشنری آهنگ‌ها (نام آهنگ و لینک فایل تلگرام و لینک عکس)
 songs = {
     "معین - آرزو داشتم": {
         "file": "https://t.me/solfg0_filebot/20",
@@ -78,14 +78,12 @@ def search_songs(message):
         for name, info in found_songs.items():
             btn = types.InlineKeyboardButton(
                 text=name,
-                callback_data=name
+                callback_data=name  # هنگام کلیک، فقط همان آهنگ ارسال شود
             )
             markup.add(btn)
         bot.send_message(message.chat.id, f"نتایج جستجو برای '{message.text}':", reply_markup=markup)
     else:
-        # حتی اگر چیزی پیدا نشد، لیست خالی میفرستیم (پیام اضافی نمی‌دهیم)
-        markup = types.InlineKeyboardMarkup()
-        bot.send_message(message.chat.id, "هیچ آهنگی پیدا نشد.", reply_markup=markup)
+        bot.send_message(message.chat.id, "هیچ نتیجه‌ای پیدا نشد.")
 
 # ======= دکمه‌های شیشه‌ای =======
 @bot.callback_query_handler(func=lambda call: True)
@@ -93,6 +91,7 @@ def callback_query(call):
     song_name = call.data
     if song_name in songs:
         info = songs[song_name]
+        # پیام فایل + دکمه شیشه‌ای برای هدایت به اینلاین
         markup = types.InlineKeyboardMarkup()
         btn = types.InlineKeyboardButton(
             text="باز کردن در ربات",
