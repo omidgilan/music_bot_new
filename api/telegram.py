@@ -5,7 +5,7 @@ from telebot import types
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
 
-# 🔹 دیکشنری آهنگ‌ها (نام آهنگ و لینک فایل تلگرام و لینک عکس)
+# 🔹 دیکشنری آهنگ‌ها
 songs = {
     "معین - آرزو داشتم": {
         "file": "https://t.me/solfg0_filebot/20",
@@ -41,30 +41,6 @@ songs = {
     }
 }
 
-# ======= آینلاین کوئری =======
-@bot.inline_handler(lambda query: True)
-def inline_query_handler(inline_query):
-    results = []
-    for name, info in songs.items():
-        markup = types.InlineKeyboardMarkup()
-        # فقط یک دکمه شیشه‌ای برای هدایت به آینلاین
-        btn = types.InlineKeyboardButton(
-            text="باز کردن در ربات",
-            switch_inline_query_current_chat=name
-        )
-        markup.add(btn)
-        results.append(types.InlineQueryResultArticle(
-            id=name,
-            title=name,
-            description="کلیک کنید برای دریافت آهنگ",
-            input_message_content=types.InputTextMessageContent(
-                message_text=f"{name}\n{info['file']}"
-            ),
-            thumbnail_url=info['thumb'],
-            reply_markup=markup
-        ))
-    bot.answer_inline_query(inline_query.id, results, cache_time=0)
-
 # ======= چت ربات =======
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -76,23 +52,65 @@ def send_welcome(message):
     markup.add(btn)
     bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
 
-# ======= ارسال آهنگ بر اساس پیام تایپ شده =======
+# ======= جستجوی متن کاربر =======
 @bot.message_handler(func=lambda m: True)
-def send_song_by_text(message):
+def search_songs(message):
     query = message.text.lower()
     matched = {name: info for name, info in songs.items() if query in name.lower()}
-    if matched:
-        for name, info in matched.items():
-            # نمایش در حال ارسال
-            bot.send_chat_action(chat_id=message.chat.id, action="typing")
-            # فقط لینک فایل و یک دکمه شیشه‌ای
-            markup = types.InlineKeyboardMarkup()
-            btn = types.InlineKeyboardButton(
-                text="باز کردن در ربات",
-                switch_inline_query_current_chat=name
-            )
-            markup.add(btn)
-            bot.send_message(message.chat.id, f"{name}\n{info['file']}", reply_markup=markup)
+
+    if not matched:
+        bot.send_message(message.chat.id, "آهنگی پیدا نشد 😕")
+        return
+
+    # ایجاد لیست شیشه‌ای
+    markup = types.InlineKeyboardMarkup()
+    for name, info in matched.items():
+        btn = types.InlineKeyboardButton(
+            text=name,
+            callback_data=name  # برای شناسایی آهنگ انتخاب شده
+        )
+        markup.add(btn)
+
+    bot.send_message(message.chat.id, f"نتایج جستجو برای: {message.text}", reply_markup=markup)
+
+# ======= دریافت کلیک روی دکمه شیشه‌ای =======
+@bot.callback_query_handler(func=lambda call: True)
+def callback_song(call):
+    info = songs.get(call.data)
+    if info:
+        # ارسال آهنگ با دکمه شیشه‌ای هدایت به حالت اینلاین
+        markup = types.InlineKeyboardMarkup()
+        btn = types.InlineKeyboardButton(
+            text="باز کردن در ربات",
+            switch_inline_query_current_chat=call.data
+        )
+        markup.add(btn)
+
+        bot.send_message(call.message.chat.id, f"{call.data}\n{info['file']}", reply_markup=markup)
+
+# ======= آینلاین کوئری =======
+@bot.inline_handler(lambda query: True)
+def inline_query_handler(inline_query):
+    results = []
+    for name, info in songs.items():
+        markup = types.InlineKeyboardMarkup()
+        btn = types.InlineKeyboardButton(
+            text="باز کردن در ربات",
+            switch_inline_query_current_chat=name
+        )
+        markup.add(btn)
+
+        results.append(types.InlineQueryResultArticle(
+            id=name,
+            title=name,
+            description="کلیک کنید برای دریافت آهنگ",
+            input_message_content=types.InputTextMessageContent(
+                message_text=f"{name}\n{info['file']}"
+            ),
+            thumbnail_url=info['thumb'],
+            reply_markup=markup
+        ))
+    bot.answer_inline_query(inline_query.id, results, cache_time=0)
 
 # ======= شروع ربات =======
 bot.infinity_polling()
