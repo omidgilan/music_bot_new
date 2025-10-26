@@ -7,14 +7,38 @@ bot = telebot.TeleBot(TOKEN)
 
 # 🔹 دیکشنری آهنگ‌ها (نام آهنگ و لینک فایل تلگرام و لینک عکس)
 songs = {
-    "معین - آرزو داشتم": {"file": "https://t.me/solfg0_filebot/20", "thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"},
-    "معین - کعبه": {"file": "https://t.me/solfg0_filebot/23", "thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"},
-    "معین - مست": {"file": "https://t.me/solfg0_filebot/25", "thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"},
-    "معین - قسم به عشقمون": {"file": "https://t.me/solfg0_filebot/46", "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"},
-    "معین - طناز": {"file": "https://t.me/solfg0_filebot/49", "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"},
-    "معین - وقتی که تو رفتی": {"file": "https://t.me/solfg0_filebot/53", "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"},
-    "معین - من باهاتم": {"file": "https://t.me/solfg0_filebot/55", "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"},
-    "معین - دعای شب": {"file": "https://t.me/solfg0_filebot/60", "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"}
+    "معین - آرزو داشتم": {
+        "file": "https://t.me/solfg0_filebot/20",
+        "thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"
+    },
+    "معین - کعبه": {
+        "file": "https://t.me/solfg0_filebot/23",
+        "thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"
+    },
+    "معین - مست": {
+        "file": "https://t.me/solfg0_filebot/25",
+        "thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"
+    },
+    "معین - قسم به عشقمون": {
+        "file": "https://t.me/solfg0_filebot/46",
+        "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
+    },
+    "معین - طناز": {
+        "file": "https://t.me/solfg0_filebot/49",
+        "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
+    },
+    "معین - وقتی که تو رفتی": {
+        "file": "https://t.me/solfg0_filebot/53",
+        "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"
+    },
+    "معین - من باهاتم": {
+        "file": "https://t.me/solfg0_filebot/55",
+        "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"
+    },
+    "معین - دعای شب": {
+        "file": "https://t.me/solfg0_filebot/60",
+        "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"
+    }
 }
 
 # ======= آینلاین کوئری =======
@@ -30,6 +54,7 @@ def inline_query_handler(inline_query):
                 switch_inline_query_current_chat=name
             )
             markup.add(btn)
+
             results.append(types.InlineQueryResultArticle(
                 id=name,
                 title=name,
@@ -43,8 +68,11 @@ def inline_query_handler(inline_query):
     bot.answer_inline_query(inline_query.id, results, cache_time=0)
 
 # ======= جستجوی آهنگ‌ها در چت ربات =======
-@bot.message_handler(func=lambda message: not message.from_user.is_bot)
+@bot.message_handler(func=lambda message: True)
 def search_songs(message):
+    if message.text.startswith("/"):  # دستورها را نادیده بگیر
+        return
+
     query = message.text.lower()
     found_songs = {name: info for name, info in songs.items() if query in name.lower()}
 
@@ -53,7 +81,7 @@ def search_songs(message):
         for name, info in found_songs.items():
             btn = types.InlineKeyboardButton(
                 text=name,
-                callback_data=name
+                callback_data=name  # هنگام کلیک، فقط همان آهنگ ارسال شود
             )
             markup.add(btn)
         bot.send_message(message.chat.id, f"نتایج جستجو برای '{message.text}':", reply_markup=markup)
@@ -66,6 +94,7 @@ def callback_query(call):
     song_name = call.data
     if song_name in songs:
         info = songs[song_name]
+        # پیام فایل + دکمه شیشه‌ای برای هدایت به اینلاین
         markup = types.InlineKeyboardMarkup()
         btn = types.InlineKeyboardButton(
             text="باز کردن در ربات",
@@ -74,4 +103,15 @@ def callback_query(call):
         markup.add(btn)
         bot.send_message(call.message.chat.id, f"{song_name}\n{info['file']}", reply_markup=markup)
 
-#
+# ======= شروع ربات =======
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    markup = types.InlineKeyboardMarkup()
+    btn = types.InlineKeyboardButton(
+        text="جستجو آهنگ‌ها",
+        switch_inline_query_current_chat=""
+    )
+    markup.add(btn)
+    bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
+
+bot.infinity_polling()
