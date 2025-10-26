@@ -22,6 +22,10 @@ songs = {
     "معین - قسم به عشقمون": {
         "file": "https://t.me/solfg0_filebot/46",
         "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
+    },
+    "معین - طناز": {  # آهنگ جدید اضافه شد
+        "file": "https://t.me/solfg0_filebot/49",
+        "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
     }
 }
 
