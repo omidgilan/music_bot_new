@@ -5,77 +5,52 @@ from telebot import types
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
 
-# 🔹 دیکشنری آهنگ‌ها (نام آهنگ و لینک فایل تلگرام و لینک عکس)
+# 🔹 دیکشنری آهنگ‌ها
 songs = {
-    "معین - آرزو داشتم": {
-        "file": "https://t.me/solfg0_filebot/20",
-        "thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"
-    },
-    "معین - کعبه": {
-        "file": "https://t.me/solfg0_filebot/23",
-        "thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"
-    },
-    "معین - مست": {
-        "file": "https://t.me/solfg0_filebot/25",
-        "thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"
-    },
-    "معین - قسم به عشقمون": {
-        "file": "https://t.me/solfg0_filebot/46",
-        "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
-    },
-    "معین - طناز": {
-        "file": "https://t.me/solfg0_filebot/49",
-        "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
-    },
-    "معین - وقتی که تو رفتی": {
-        "file": "https://t.me/solfg0_filebot/53",
-        "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"
-    },
-    "معین - من باهاتم": {
-        "file": "https://t.me/solfg0_filebot/55",
-        "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"
-    },
-    "معین - دعای شب": {
-        "file": "https://t.me/solfg0_filebot/60",
-        "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"
-    }
+    "معین - آرزو داشتم": "https://t.me/solfg0_filebot/20",
+    "معین - کعبه": "https://t.me/solfg0_filebot/23",
+    "معین - مست": "https://t.me/solfg0_filebot/25",
+    "معین - قسم به عشقمون": "https://t.me/solfg0_filebot/46",
+    "معین - طناز": "https://t.me/solfg0_filebot/49",
+    "معین - وقتی که تو رفتی": "https://t.me/solfg0_filebot/53",
+    "معین - من باهاتم": "https://t.me/solfg0_filebot/55",
+    "معین - دعای شب": "https://t.me/solfg0_filebot/60"
 }
 
-# ======= آینلاین کوئری =======
-@bot.inline_handler(lambda query: True)
-def inline_query_handler(inline_query):
-    results = []
-    for name, info in songs.items():
-        # هر آیتم آینلاین با دکمه شیشه‌ای برای رفتن به چت ربات
-        markup = types.InlineKeyboardMarkup()
-        btn = types.InlineKeyboardButton(
-            text="باز کردن در ربات",
-            switch_inline_query_current_chat=name
-        )
-        markup.add(btn)
-
-        results.append(types.InlineQueryResultArticle(
-            id=name,
-            title=name,
-            description="کلیک کنید برای دریافت آهنگ",
-            input_message_content=types.InputTextMessageContent(
-                message_text=f"{name}\n{info['file']}"
-            ),
-            thumbnail_url=info['thumb'],
-            reply_markup=markup
-        ))
-    bot.answer_inline_query(inline_query.id, results, cache_time=0)
-
-# ======= چت ربات =======
+# ======= شروع پیام خوشامد =======
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    markup = types.InlineKeyboardMarkup()
-    btn = types.InlineKeyboardButton(
-        text="جستجو آهنگ‌ها",
-        switch_inline_query_current_chat=""
-    )
-    markup.add(btn)
-    bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
+    bot.send_message(message.chat.id, "سلام! نام خواننده یا آهنگ را ارسال کنید تا نتایج برای شما نمایش داده شود.")
+
+# ======= جستجو و دکمه شیشه‌ای =======
+@bot.message_handler(func=lambda message: True)
+def search_songs(message):
+    query = message.text.lower()
+    results = {name: link for name, link in songs.items() if query in name.lower()}
+
+    if not results:
+        bot.send_message(message.chat.id, "هیچ نتیجه‌ای یافت نشد.")
+        return
+
+    # متن بالای دکمه‌ها
+    bot.send_message(message.chat.id, f"نتایج جستجو برای '{message.text}':")
+
+    # ساخت کیبرد شیشه‌ای
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    for name, link in results.items():
+        btn = types.KeyboardButton(f"{name} - دریافت آهنگ")
+        markup.add(btn)
+
+    bot.send_message(message.chat.id, "برای دریافت آهنگ روی دکمه زیر بزنید:", reply_markup=markup)
+
+# ======= ارسال لینک آهنگ وقتی دکمه زده شد =======
+@bot.message_handler(func=lambda message: message.text.endswith("- دریافت آهنگ"))
+def send_song_link(message):
+    name = message.text.replace(" - دریافت آهنگ", "")
+    if name in songs:
+        bot.send_message(message.chat.id, songs[name])
+    else:
+        bot.send_message(message.chat.id, "خطا: آهنگ پیدا نشد.")
 
 # ======= شروع ربات =======
 bot.infinity_polling()
