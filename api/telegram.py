@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+import threading
 
 # 🔹 توکن ربات
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
@@ -52,7 +53,7 @@ def send_welcome(message):
     markup.add(btn)
     bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
 
-# ======= جستجوی متن کاربر =======
+# ======= جستجوی متن کاربر با پردازش سریع =======
 @bot.message_handler(func=lambda m: True)
 def search_songs(message):
     query = message.text.lower()
@@ -64,29 +65,31 @@ def search_songs(message):
 
     # ایجاد لیست شیشه‌ای
     markup = types.InlineKeyboardMarkup()
-    for name, info in matched.items():
+    for name in matched.keys():
         btn = types.InlineKeyboardButton(
             text=name,
-            callback_data=name  # برای شناسایی آهنگ انتخاب شده
+            callback_data=name
         )
         markup.add(btn)
 
     bot.send_message(message.chat.id, f"نتایج جستجو برای: {message.text}", reply_markup=markup)
 
-# ======= دریافت کلیک روی دکمه شیشه‌ای =======
+# ======= دریافت کلیک روی دکمه شیشه‌ای با ارسال سریع =======
 @bot.callback_query_handler(func=lambda call: True)
 def callback_song(call):
     info = songs.get(call.data)
     if info:
-        # ارسال آهنگ با دکمه شیشه‌ای هدایت به حالت اینلاین
-        markup = types.InlineKeyboardMarkup()
-        btn = types.InlineKeyboardButton(
-            text="باز کردن در ربات",
-            switch_inline_query_current_chat=call.data
-        )
-        markup.add(btn)
+        threading.Thread(target=send_song, args=(call, info)).start()
 
-        bot.send_message(call.message.chat.id, f"{call.data}\n{info['file']}", reply_markup=markup)
+def send_song(call, info):
+    markup = types.InlineKeyboardMarkup()
+    btn = types.InlineKeyboardButton(
+        text="باز کردن در ربات",
+        switch_inline_query_current_chat=call.data
+    )
+    markup.add(btn)
+
+    bot.send_message(call.message.chat.id, f"{call.data}\n{info['file']}", reply_markup=markup)
 
 # ======= آینلاین کوئری =======
 @bot.inline_handler(lambda query: True)
