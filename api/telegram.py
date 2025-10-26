@@ -45,15 +45,16 @@ songs = {
 @bot.inline_handler(lambda query: True)
 def inline_query_handler(inline_query):
     results = []
-    query_text = inline_query.query.lower().split()  # هر کلمه جدا میشه
+    query_text = inline_query.query.lower()
     for name, info in songs.items():
-        if all(word in name.lower() for word in query_text):
+        if query_text in name.lower():
             markup = types.InlineKeyboardMarkup()
             btn = types.InlineKeyboardButton(
                 text="باز کردن در ربات",
                 switch_inline_query_current_chat=name
             )
             markup.add(btn)
+
             results.append(types.InlineQueryResultArticle(
                 id=name,
                 title=name,
@@ -66,8 +67,19 @@ def inline_query_handler(inline_query):
             ))
     bot.answer_inline_query(inline_query.id, results, cache_time=0)
 
+# ======= شروع ربات =======
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    markup = types.InlineKeyboardMarkup()
+    btn = types.InlineKeyboardButton(
+        text="جستجو آهنگ‌ها",
+        switch_inline_query_current_chat=""
+    )
+    markup.add(btn)
+    bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
+
 # ======= جستجوی آهنگ‌ها در چت ربات =======
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: not message.text.startswith('/'))
 def search_songs(message):
     query_words = message.text.lower().split()
     found_songs = {}
@@ -102,14 +114,4 @@ def callback_query(call):
         bot.send_message(call.message.chat.id, f"{song_name}\n{info['file']}", reply_markup=markup)
 
 # ======= شروع ربات =======
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    markup = types.InlineKeyboardMarkup()
-    btn = types.InlineKeyboardButton(
-        text="جستجو آهنگ‌ها",
-        switch_inline_query_current_chat=""
-    )
-    markup.add(btn)
-    bot.send_message(message.chat.id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
-
 bot.infinity_polling()
