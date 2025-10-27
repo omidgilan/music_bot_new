@@ -102,4 +102,3 @@ markup.add(btn)
 bot.send_message(call.message.chat.id, f"{song_name}\n{info['file']}", reply_markup=markup)
 
 bot.infinity_polling()
-ببین مشکلش کجاست
