@@ -5,45 +5,50 @@ TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
 
 songs = {
-"معین - آرزو داشتم": {
-"file": "https://t.me/solfg0_filebot/20",
-"thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"
-},
-"معین - کعبه": {
-"file": "https://t.me/solfg0_filebot/23",
-"thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"
-},
-"معین - مست": {
-"file": "https://t.me/solfg0_filebot/25",
-"thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"
-},
-"معین - قسم به عشقمون": {
-"file": "https://t.me/solfg0_filebot/46",
-"thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
-},
-"معین - طناز": {
-"file": "https://t.me/solfg0_filebot/49",
-"thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
-},
-"معین - وقتی که تو رفتی": {
-"file": "https://t.me/solfg0_filebot/53",
-"thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"
-},
-"معین - من باهاتم": {
-"file": "https://t.me/solfg0_filebot/55",
-"thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"
-},
-"معین - دعای شب": {
-"file": "https://t.me/solfg0_filebot/60",
-"thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"
-},
-"معین - وقتی سرت رو شونه": {
-"file": "https://t.me/solfg0_filebot/63",
-"thumb": "https://i.ibb.co/xtQr6J0H/images-4.jpg"
-},
-"معین - کفتر کاکل بسر": {
-"file": "https://t.me/solfg0_filebot/65",
-"thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"
+    "معین - آرزو داشتم": {
+        "file": "https://t.me/solfg0_filebot/20",
+        "thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"
+    },
+    "معین - کعبه": {
+        "file": "https://t.me/solfg0_filebot/23",
+        "thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"
+    },
+    "معین - مست": {
+        "file": "https://t.me/solfg0_filebot/25",
+        "thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"
+    },
+    "معین - قسم به عشقمون": {
+        "file": "https://t.me/solfg0_filebot/46",
+        "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"
+    },
+    "معین - طناز": {
+        "file": "https://t.me/solfg0_filebot/49",
+        "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"
+    },
+    "معین - وقتی که تو رفتی": {
+        "file": "https://t.me/solfg0_filebot/53",
+        "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"
+    },
+    "معین - من باهاتم": {
+        "file": "https://t.me/solfg0_filebot/55",
+        "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"
+    },
+    "معین - دعای شب": {
+        "file": "https://t.me/solfg0_filebot/60",
+        "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"
+    },
+    "معین - وقتی سرت رو شونه": {
+        "file": "https://t.me/solfg0_filebot/63",
+        "thumb": "https://i.ibb.co/xtQr6J0H/images-4.jpg"
+    },
+    "معین - کفتر کاکل بسر": {
+        "file": "https://t.me/solfg0_filebot/65",
+        "thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"
+    },
+    "معین - من از راه اومدم": {
+        "file": "https://t.me/solfg0_filebot/68",
+        "thumb": "https://i.ibb.co/PZ1G9Xy4/images-6.jpg"
+    }
 }
 
 ======= آینلاین کوئری =======
