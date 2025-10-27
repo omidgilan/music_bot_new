@@ -1,4 +1,4 @@
-import telebot from telebot import types
+import telebotfrom telebot import types
 
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
@@ -39,11 +39,11 @@ songs = {
     "معین - وقتی سرت رو شونه": {
         "file": "https://t.me/solfg0_filebot/63",
         "thumb": "https://i.ibb.co/xtQr6J0H/images-4.jpg"
-   },
+    },
    "معین - کفتر کاکل بسر": {
-    "file": "https://t.me/solfg0_filebot/65",
-    "thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"
-   }
+        "file": "https://t.me/solfg0_filebot/65",
+        "thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"
+    }
     
 
 # ======= آینلاین کوئری =======
