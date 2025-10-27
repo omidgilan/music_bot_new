@@ -1,4 +1,4 @@
-import telebotfrom telebot import types
+import telebot from telebot import types
 
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
