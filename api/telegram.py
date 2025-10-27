@@ -42,7 +42,8 @@ songs = {
 },
 "معین - کفتر کاکل بسر": {
     "file": "https://t.me/solfg0_filebot/65",
-    "thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"}
+    "thumb": "https://i.ibb.co/spkqC27H/images-5.jpg"
+}
     
 
 # ======= آینلاین کوئری =======
