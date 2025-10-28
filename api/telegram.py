@@ -2,6 +2,8 @@ import telebot
 from telebot import types
 import json
 import os
+from flask import Flask
+import threading
 
 TOKEN = "5548149661:AAFblu4NL86utR9SbzuE6RQ27HuD3Uiynas"
 bot = telebot.TeleBot(TOKEN)
@@ -9,6 +11,13 @@ bot = telebot.TeleBot(TOKEN)
 SONGS_FILE = "songs.json"
 USERS_FILE = "users.json"
 MY_ID = 5382282676  # فقط این آی‌دی می‌تواند آهنگ‌ها را حذف کند
+
+# ===== Flask برای /ping =====
+app = Flask(__name__)
+
+@app.route("/ping")
+def ping():
+    return "pong", 200
 
 # ===== بارگذاری آهنگ‌ها =====
 if os.path.exists(SONGS_FILE):
@@ -42,7 +51,7 @@ def get_songs_count():
 def get_users_count():
     return len(users)
 
-# ===== آینلاین نامحدود با offset + مارک ربات استاندارد =====
+# ===== آینلاین با مارک ربات =====
 @bot.inline_handler(lambda query: True)
 def inline_query_handler(inline_query):
     query_text = inline_query.query.lower()
@@ -91,7 +100,7 @@ def send_paginated_buttons(chat_id, song_list, page=0, per_page=10):
         else:
             markup.add(btn_song)
 
-nav_buttons = []
+    nav_buttons = []
     if page > 0:
         nav_buttons.append(types.InlineKeyboardButton(text="⬅️ قبل", callback_data=f"page_{page-1}"))
     if end < len(song_list):
@@ -115,9 +124,7 @@ def send_welcome(message):
     count_btn = types.InlineKeyboardButton(text=f"تعداد ترانه‌ها: {get_songs_count()}", callback_data="count")
     users_btn = types.InlineKeyboardButton(text=f"تعداد کاربران: {get_users_count()}", callback_data="users_count")
     search_btn = types.InlineKeyboardButton(text="جستجو آهنگ‌ها", switch_inline_query_current_chat="")
-    markup.add(count_btn)
-    markup.add(users_btn)
-    markup.add(search_btn)
+    markup.add(count_btn, users_btn, search_btn)
 
     bot.send_message(chat_id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
 
@@ -180,4 +187,12 @@ def callback_query(call):
         markup.add(btn)
         bot.send_message(chat_id, f"{data}\n{info['file']}", reply_markup=markup)
 
-bot.infinity_polling()
+# ===== اجرای همزمان Telebot و Flask =====
+def run_telebot():
+    bot.infinity_polling()
+
+def run_flask():
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+
+threading.Thread(target=run_telebot).start()
+threading.Thread(target=run_flask).start()
