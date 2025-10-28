@@ -24,18 +24,7 @@ if os.path.exists(SONGS_FILE):
     with open(SONGS_FILE, "r", encoding="utf-8") as f:
         songs = json.load(f)
 else:
-    songs = {
-        "معین - آرزو داشتم": {"file": "https://t.me/solfg0_filebot/20", "thumb": "https://i.ibb.co/TMJLFKHZ/IMG-20251026-000741-631.jpg"},
-        "معین - کعبه": {"file": "https://t.me/solfg0_filebot/23", "thumb": "https://i.ibb.co/KTLVWDk/IMG-20251026-032304-853.jpg"},
-        "معین - مست": {"file": "https://t.me/solfg0_filebot/25", "thumb": "https://i.ibb.co/Hp36wWKT/images.jpg"},
-        "معین - قسم به عشقمون": {"file": "https://t.me/solfg0_filebot/46", "thumb": "https://i.ibb.co/PsCdG52g/images-1.jpg"},
-        "معین - طناز": {"file": "https://t.me/solfg0_filebot/49", "thumb": "https://i.ibb.co/ccs62YZp/images.jpg"},
-        "معین - وقتی که تو رفتی": {"file": "https://t.me/solfg0_filebot/53", "thumb": "https://i.ibb.co/prnk7QHn/images-1.jpg"},
-        "معین - من باهاتم": {"file": "https://t.me/solfg0_filebot/55", "thumb": "https://i.ibb.co/HDt4JXSV/images-2.jpg"},
-        "معین - دعای شب": {"file": "https://t.me/solfg0_filebot/60", "thumb": "https://i.ibb.co/gM4K5rtg/images-3.jpg"},
-        "معین - از راه اومدم": {"file": "https://t.me/solfg0_filebot/68", "thumb": "https://i.ibb.co/TDW3bhPN/images-1.jpg"},
-        "معین - پروردگار": {"file": "https://t.me/solfg0_filebot/70", "thumb": "https://i.ibb.co/KzhXDh8B/images.jpg"}
-    }
+    songs = {}
 
 # ===== بارگذاری کاربران =====
 if os.path.exists(USERS_FILE):
@@ -44,14 +33,23 @@ if os.path.exists(USERS_FILE):
 else:
     users = []
 
-# ===== توابع شمارش =====
+# ===== توابع ذخیره‌سازی =====
+def save_songs():
+    with open(SONGS_FILE, "w", encoding="utf-8") as f:
+        json.dump(songs, f, ensure_ascii=False, indent=4)
+
+def save_users():
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(users, f, ensure_ascii=False, indent=4)
+
+# ===== شمارش =====
 def get_songs_count():
     return len(songs)
 
 def get_users_count():
     return len(users)
 
-# ===== آینلاین با مارک ربات =====
+# ===== Inline با مارک ربات =====
 @bot.inline_handler(lambda query: True)
 def inline_query_handler(inline_query):
     query_text = inline_query.query.lower()
@@ -86,7 +84,7 @@ def inline_query_handler(inline_query):
         switch_pm_parameter="start"
     )
 
-# ===== صفحه‌بندی دکمه‌ها با حذف =====
+# ===== دکمه‌ها با صفحه‌بندی =====
 def send_paginated_buttons(chat_id, song_list, page=0, per_page=10):
     start = page * per_page
     end = start + per_page
@@ -110,15 +108,13 @@ def send_paginated_buttons(chat_id, song_list, page=0, per_page=10):
 
     bot.send_message(chat_id, "نتایج جستجو:", reply_markup=markup)
 
-# ===== استارت ربات =====
+# ===== استارت =====
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     chat_id = message.chat.id
-
     if chat_id not in users:
         users.append(chat_id)
-        with open(USERS_FILE, "w", encoding="utf-8") as f:
-            json.dump(users, f, ensure_ascii=False, indent=4)
+        save_users()
 
     markup = types.InlineKeyboardMarkup()
     count_btn = types.InlineKeyboardButton(text=f"تعداد ترانه‌ها: {get_songs_count()}", callback_data="count")
@@ -128,7 +124,7 @@ def send_welcome(message):
 
     bot.send_message(chat_id, "سلام! برای پیدا کردن آهنگ‌ها روی دکمه زیر بزنید:", reply_markup=markup)
 
-# ===== جستجو و اضافه کردن آهنگ =====
+# ===== جستجو و اضافه آهنگ =====
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     text = message.text.strip()
@@ -137,8 +133,7 @@ def handle_message(message):
         if len(parts) == 3:
             name, file_link, thumb_link = parts
             songs[name] = {"file": file_link, "thumb": thumb_link}
-            with open(SONGS_FILE, "w", encoding="utf-8") as f:
-                json.dump(songs, f, ensure_ascii=False, indent=4)
+            save_songs()
             bot.send_message(message.chat.id, f"🎵 آهنگ '{name}' با موفقیت اضافه شد.")
             return
         else:
@@ -148,12 +143,11 @@ def handle_message(message):
     query_words = text.lower().split()
     found_songs = {name: info for name, info in songs.items() if all(word in name.lower() for word in query_words)}
     if found_songs:
-        song_list = list(found_songs.keys())
-        send_paginated_buttons(message.chat.id, song_list)
+        send_paginated_buttons(message.chat.id, list(found_songs.keys()))
     else:
         bot.send_message(message.chat.id, "هیچ نتیجه‌ای پیدا نشد.")
 
-# ===== دکمه‌های شیشه‌ای و حذف =====
+# ===== Callback دکمه‌ها =====
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     data = call.data
@@ -167,18 +161,15 @@ def callback_query(call):
         return
     if data.startswith("page_"):
         page = int(data.split("_")[1])
-        song_list = list(songs.keys())
-        send_paginated_buttons(chat_id, song_list, page)
+        send_paginated_buttons(chat_id, list(songs.keys()), page)
         return
     if data.startswith("delete_"):
         song_to_delete = data.split("_", 1)[1]
         if chat_id == MY_ID and song_to_delete in songs:
             del songs[song_to_delete]
-            with open(SONGS_FILE, "w", encoding="utf-8") as f:
-                json.dump(songs, f, ensure_ascii=False, indent=4)
+            save_songs()
             bot.answer_callback_query(call.id, text=f"آهنگ '{song_to_delete}' حذف شد.")
-            song_list = list(songs.keys())
-            send_paginated_buttons(chat_id, song_list)
+            send_paginated_buttons(chat_id, list(songs.keys()))
         return
     if data in songs:
         info = songs[data]
